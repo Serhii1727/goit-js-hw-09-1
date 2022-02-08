@@ -1,8 +1,53 @@
+import Notiflix from 'notiflix'
+
+const form = document.querySelector('.form')
+const inputDelay = document.querySelector('[name = delay]') // ввод первой задержки в милисекундах
+const step = document.querySelector('[name = step]') // шаг увиличения задержки для каждого промиса поcле первого
+const amount = document.querySelector('[name = amount]') // количество промисов
+
+
+form.addEventListener('submit', onFormSubmit)
+
+
 function createPromise(position, delay) {
-  const shouldResolve = Math.random() > 0.3;
-  if (shouldResolve) {
-    // Fulfill
-  } else {
-    // Reject
-  }
+    return new Promise((resolve, reject) => {
+
+        const shouldResolve = Math.random() > 0.3;
+
+        setTimeout(() => {
+
+            if (shouldResolve) {
+                resolve({ position, delay })
+            } else {
+                reject({ position, delay })
+            }
+
+        }, delay)
+    })
+}
+
+
+
+
+function onFormSubmit(event) {
+    event.preventDefault()
+
+    let delay = Number(inputDelay.value)
+    let amountNumber = Number(amount.value)
+    let stepDelay = Number(step.value)
+
+
+    for (let i = 1; i <= amountNumber; i += 1) {
+
+        createPromise(i, delay)
+            .then(({ position, delay }) => {
+                Notiflix.Notify.warning(`✅ Fulfilled promise ${position} in ${delay}ms`);
+            })
+            .catch(({ position, delay }) => {
+                Notiflix.Notify.warning(`❌ Rejected promise ${position} in ${delay}ms`);
+            })
+
+        delay += stepDelay
+    }
+
 }
